@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using OpenChat.API.Models;
-using OpenChat.API.Services;
+using OpenChat.Application.Interfaces.Services;
+using OpenChat.Domain.Dtos;
 
 namespace OpenChat.API.Controllers;
 
