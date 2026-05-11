@@ -15,8 +15,6 @@ A full-stack local AI chat application. Chat in real time with a locally running
 
 ## Screenshots
 
-## Screenshots
-
 | | |
 |:---:|:---:|
 | <img src="https://github.com/user-attachments/assets/7f847eeb-1331-44d6-b2fc-c78bdd0ffe2e" alt="Welcome screen" /> | <img src="https://github.com/user-attachments/assets/682edae5-7c37-48a2-9b99-023167c10828" alt="Chat with tool calling and source citation" /> |
