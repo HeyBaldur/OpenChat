@@ -1,0 +1,71 @@
+<div class="min-h-screen bg-neutral-950 flex items-center justify-center px-4">
+  <div class="w-full max-w-sm">
+
+    <!-- Logo -->
+    <div class="flex flex-col items-center gap-3 mb-8">
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 via-blue-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-purple-900/40">
+        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+        </svg>
+      </div>
+      <div class="text-center">
+        <h1 class="text-xl font-bold text-gradient">Welcome back</h1>
+        <p class="text-sm text-neutral-500 mt-0.5">Sign in to your account</p>
+      </div>
+    </div>
+
+    <!-- Card -->
+    <div class="bg-neutral-900 border border-white/8 rounded-2xl p-6 space-y-4">
+
+      @if (error()) {
+        <div class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs">
+          <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+          </svg>
+          {{ error() }}
+        </div>
+      }
+
+      <div>
+        <label class="block text-xs font-medium text-neutral-400 mb-1.5">Email</label>
+        <input
+          type="email"
+          [(ngModel)]="email"
+          (keydown.enter)="submit()"
+          placeholder="you@example.com"
+          autocomplete="email"
+          class="w-full bg-neutral-950 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-purple-500/50 transition-colors"
+        />
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-neutral-400 mb-1.5">Password</label>
+        <input
+          type="password"
+          [(ngModel)]="password"
+          (keydown.enter)="submit()"
+          placeholder="••••••••"
+          autocomplete="current-password"
+          class="w-full bg-neutral-950 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-purple-500/50 transition-colors"
+        />
+      </div>
+
+      <div class="btn-gradient-border w-full mt-2" [class.opacity-60]="loading()" [class.pointer-events-none]="loading()">
+        <span (click)="submit()" class="cursor-pointer">
+          @if (loading()) {
+            <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+            Signing in...
+          } @else {
+            Sign in
+          }
+        </span>
+      </div>
+    </div>
+
+    <p class="text-center text-xs text-neutral-600 mt-5">
+      Don't have an account?
+      <a routerLink="/signup" class="text-purple-400 hover:text-purple-300 transition-colors ml-1">Create one</a>
+    </p>
+
+  </div>
+</div>

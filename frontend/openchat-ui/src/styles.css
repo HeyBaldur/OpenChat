@@ -1,0 +1,182 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@import 'highlight.js/styles/github-dark.css';
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+a, button, [role="button"] {
+  cursor: pointer;
+  @apply font-semibold;
+}
+
+/* ── Code blocks ─────────────────────────────────────────────
+   pre  = visual container (background, border, padding)
+   code = transparent — hljs only colorises the text spans    */
+
+.prose pre {
+  position: relative;
+  background: #0d1117 !important;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin: 0.75rem 0;
+  overflow-x: auto;
+}
+
+/* Strip hljs own background and padding from the inner code */
+.prose pre code,
+.prose pre code.hljs {
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  color: inherit;
+}
+
+/* Inline code  (not inside pre) */
+.prose :not(pre) > code {
+  background: rgba(139,92,246,0.12) !important;
+  color: #22d3ee !important;
+  padding: 0.15em 0.45em !important;
+  border-radius: 0.3rem !important;
+  font-size: 0.8125rem !important;
+  font-weight: 400 !important;
+}
+
+/* ── Copy-code button ────────────────────────────────────── */
+.code-block-wrapper {
+  position: relative;
+}
+
+.copy-code-btn {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.68rem;
+  font-family: inherit;
+  border-radius: 0.35rem;
+  background: rgba(255,255,255,0.06);
+  color: #9ca3af;
+  border: 1px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s, color 0.15s;
+  z-index: 1;
+}
+
+.code-block-wrapper:hover .copy-code-btn {
+  opacity: 1;
+}
+
+.copy-code-btn:hover {
+  background: rgba(255,255,255,0.12);
+  color: #e5e7eb;
+}
+
+.copy-code-btn.copied {
+  color: #22d3ee;
+  border-color: rgba(34,211,238,0.4);
+}
+
+/* ── Markdown Tables ─────────────────────────────────────── */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.875rem 0;
+  font-size: 0.8125rem;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 0.6rem;
+  overflow: hidden;
+  display: table;
+}
+
+.prose thead tr {
+  background: rgba(255,255,255,0.06);
+}
+
+.prose th {
+  padding: 0.55rem 0.875rem;
+  text-align: left;
+  font-weight: 600;
+  color: #f9fafb !important;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  white-space: nowrap;
+}
+
+.prose td {
+  padding: 0.5rem 0.875rem;
+  color: #d1d5db !important;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  vertical-align: top;
+}
+
+.prose tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.prose tbody tr:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+/* ── Custom scrollbars ───────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(139,92,246,0.25);
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139,92,246,0.5);
+}
+
+/* ── Gradient text utility ───────────────────────────────── */
+.text-gradient {
+  background: linear-gradient(135deg, #a78bfa, #60a5fa, #22d3ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Gradient border button ──────────────────────────────── */
+.btn-gradient-border {
+  padding: 1px;
+  background: linear-gradient(135deg, #7c3aed, #3b82f6, #06b6d4);
+  border-radius: 0.625rem;
+  display: inline-block;
+}
+
+.btn-gradient-border > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  background: #0a0a0f;
+  border-radius: calc(0.625rem - 1px);
+  padding: 0.625rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #e2e8f0;
+  transition: background 0.2s;
+}
+
+.btn-gradient-border:hover > span {
+  background: transparent;
+  color: #ffffff;
+}

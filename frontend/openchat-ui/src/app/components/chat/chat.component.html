@@ -1,0 +1,301 @@
+<div class="flex h-screen bg-neutral-950 overflow-hidden">
+  <!-- Sidebar -->
+  <app-sidebar
+    #sidebar
+    [userId]="userId"
+    [activeConversationId]="activeConversation()?.id ?? null"
+    (conversationSelected)="selectConversation($event)"
+    (newChat)="startNewChat()"
+  />
+
+  <!-- Main -->
+  <div class="relative flex flex-col flex-1 min-w-0 bg-transparent">
+    <!-- Header -->
+    <header
+      class="flex items-center justify-between px-6 py-3 border-b border-white/8 shrink-0 bg-neutral-950/60 backdrop-blur-sm"
+    >
+      <span class="text-sm font-medium text-white truncate">
+        {{ activeConversation()?.title ?? 'New Chat' }}
+      </span>
+      <div class="flex items-center gap-3 shrink-0 ml-4">
+        @if (activeConversation()?.totalTokens) {
+          <span class="text-xs text-neutral-500">
+            {{ activeConversation()!.totalTokens | number }} tokens
+          </span>
+        }
+        <app-model-selector
+          [selectedModel]="selectedModel()"
+          [disabled]="isStreaming()"
+          (modelChange)="onModelChange($event)"
+        />
+      </div>
+    </header>
+
+    <!-- Model missing banner -->
+    @if (modelMissingBanner()) {
+      <div
+        class="shrink-0 px-4 py-2 bg-amber-500/10 border-b border-amber-500/20 flex items-center gap-2"
+      >
+        <svg
+          class="w-3.5 h-3.5 text-amber-400 shrink-0"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
+        </svg>
+        <p class="text-xs text-amber-300">
+          Model <span class="font-mono">{{ modelMissingBanner() }}</span> is no longer installed.
+          Using available model. Change in selector to silence.
+        </p>
+      </div>
+    }
+
+    <!-- Scroll-to-bottom button -->
+    @if (userScrolledUp()) {
+      <div class="absolute bottom-24 left-1/2 -translate-x-1/2 z-10">
+        <button
+          (click)="scrollToBottomNow()"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-800 border border-purple-500/30 text-neutral-300 hover:text-white hover:bg-neutral-700 text-xs shadow-lg transition-colors"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+          Scroll to bottom
+        </button>
+      </div>
+    }
+
+    <!-- Messages -->
+    <div #scrollContainer class="flex-1 overflow-y-auto" (scroll)="onScroll()">
+      <div class="max-w-3xl mx-auto px-4 py-8 space-y-8">
+        <!-- Empty state -->
+        @if (messages().length === 0 && !isStreaming()) {
+          <div class="flex flex-col items-center justify-center min-h-[70vh] gap-10">
+            <!-- Hero -->
+            <div class="flex flex-col items-center gap-4 text-center">
+              <div class="relative">
+                <div
+                  class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 via-blue-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-purple-900/40"
+                >
+                  <svg
+                    class="w-8 h-8 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.75"
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div>
+                <h1 class="text-3xl font-bold text-gradient tracking-tight">OpenChatAi</h1>
+                <p class="mt-1.5 text-neutral-500 text-sm">How can I help you today?</p>
+              </div>
+            </div>
+
+            <!-- Suggestion cards -->
+            <div class="grid grid-cols-2 gap-3 w-full max-w-xl">
+              @for (s of suggestions; track s.label) {
+                <button
+                  (click)="sendMessage(s.prompt)"
+                  class="group/card relative flex flex-col gap-3 p-4 rounded-2xl text-left bg-neutral-900/60 backdrop-blur-sm border border-white/8 hover:border-purple-500/40 hover:bg-purple-500/10 transition-all duration-200 shadow-sm"
+                >
+                  <div
+                    class="w-8 h-8 rounded-lg bg-purple-900/50 border border-purple-700/30 flex items-center justify-center text-purple-400 group-hover/card:bg-purple-900/70 transition-colors [&>svg]:w-4 [&>svg]:h-4"
+                    [innerHTML]="safeIcon(s.icon)"
+                  ></div>
+                  <div>
+                    <p class="text-sm font-semibold text-white">{{ s.label }}</p>
+                    <p class="text-xs text-neutral-500 mt-0.5 leading-snug">{{ s.description }}</p>
+                  </div>
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Message list -->
+        @for (msg of messages(); track $index; let i = $index, last = $last) {
+          @if (msg.role === 'system') {
+            <div class="flex items-center gap-3 py-1">
+              <div class="flex-1 h-px bg-white/8"></div>
+              <span class="text-xs text-neutral-600 shrink-0">{{ msg.content }}</span>
+              <div class="flex-1 h-px bg-white/8"></div>
+            </div>
+          } @else if (msg.role === 'user') {
+            <app-user-message
+              [content]="msg.content"
+              [editing]="editingIndex() === i"
+              [disableEdit]="isStreaming()"
+              (editStarted)="editingIndex.set(i)"
+              (editCancelled)="editingIndex.set(null)"
+              (editSubmit)="editMessage(i, $event)"
+            />
+          } @else if (msg.role === 'assistant') {
+            <!-- Assistant message (historical) -->
+            <div class="flex gap-4 items-start">
+              <div
+                class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5 shadow-md shadow-purple-900/30"
+              >
+                O
+              </div>
+              <div class="flex-1 min-w-0">
+                <app-markdown-message
+                  [content]="msg.content"
+                  [streaming]="false"
+                  [showRegenerate]="last && !isStreaming()"
+                  (regenerate)="regenerateResponse()"
+                />
+                @if (msg.stopped) {
+                  <p class="mt-1.5 ml-1 text-xs text-neutral-600 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                      <rect x="4" y="4" width="16" height="16" rx="2" />
+                    </svg>
+                    Response stopped
+                  </p>
+                }
+                @if (msg.toolCallsUsed && msg.toolCallsUsed.length > 0) {
+                  <app-sources-footer [toolCalls]="msg.toolCallsUsed" />
+                }
+              </div>
+            </div>
+          }
+        }
+
+        <!-- Streaming: active assistant response -->
+        @if (isStreaming()) {
+          <div class="flex gap-4 items-start">
+            <div
+              class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5 shadow-md shadow-purple-900/30"
+            >
+              O
+            </div>
+            <div class="flex-1 min-w-0 pt-0.5">
+              <!-- Tool call indicators -->
+              @if (inProgressToolCalls().length > 0) {
+                <div class="flex flex-col gap-1.5 mb-3">
+                  @for (call of inProgressToolCalls(); track call.startedAt) {
+                    <app-tool-indicator [call]="call" />
+                  }
+                </div>
+              }
+
+              <!-- Streaming content or thinking dots -->
+              @if (streamingContent()) {
+                <app-markdown-message [content]="streamingContent()" [streaming]="true" />
+              } @else {
+                <div
+                  class="bg-neutral-900/70 backdrop-blur-sm rounded-2xl px-4 py-3 border border-white/6"
+                >
+                  <div class="flex gap-1.5 items-center h-6">
+                    <span
+                      class="w-2 h-2 rounded-full bg-purple-400 animate-bounce"
+                      style="animation-delay: 0ms"
+                    ></span>
+                    <span
+                      class="w-2 h-2 rounded-full bg-blue-400 animate-bounce"
+                      style="animation-delay: 150ms"
+                    ></span>
+                    <span
+                      class="w-2 h-2 rounded-full bg-cyan-400 animate-bounce"
+                      style="animation-delay: 300ms"
+                    ></span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <div #messagesEnd></div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="shrink-0 px-4 pb-6 pt-2">
+      <div class="max-w-3xl mx-auto">
+        <div
+          class="p-px bg-gradient-to-r from-purple-600/60 via-blue-500/40 to-cyan-400/30 rounded-2xl focus-within:from-purple-500 focus-within:via-blue-500 focus-within:to-cyan-400 transition-all duration-300"
+        >
+          <div class="flex items-end gap-2 bg-neutral-900 rounded-[calc(1rem-1px)] px-4 py-3">
+            <textarea
+              #textareaEl
+              [(ngModel)]="inputText"
+              (keydown)="onKeyDown($event)"
+              (input)="autoResize()"
+              [placeholder]="
+                isStreaming()
+                  ? 'Type now — will send when response finishes...'
+                  : 'Message OpenChatAi...'
+              "
+              rows="1"
+              class="flex-1 bg-transparent text-neutral-100 placeholder-neutral-600 text-sm resize-none focus:outline-none leading-relaxed max-h-40 overflow-y-auto self-center py-0"
+            ></textarea>
+            @if (isStreaming()) {
+              <button
+                (click)="stopStreaming()"
+                class="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-neutral-700 hover:bg-neutral-600 text-white transition-colors"
+                title="Stop generating"
+              >
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                  <rect x="4" y="4" width="16" height="16" rx="2" />
+                </svg>
+              </button>
+            } @else {
+              <button
+                (click)="sendMessage()"
+                [disabled]="!inputText.trim()"
+                class="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                [class.bg-gradient-to-br]="inputText.trim()"
+                [class.from-purple-600]="inputText.trim()"
+                [class.to-blue-500]="inputText.trim()"
+                [class.text-white]="inputText.trim()"
+                [class.bg-neutral-800]="!inputText.trim()"
+                [class.text-neutral-500]="!inputText.trim()"
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                </svg>
+              </button>
+            }
+          </div>
+        </div>
+        @if (pendingMessage()) {
+          <p
+            class="text-center text-xs text-amber-500/70 mt-2 flex items-center justify-center gap-1.5"
+          >
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            Message queued — will send when response finishes
+          </p>
+        } @else {
+          <p class="text-center text-xs text-neutral-700 mt-2">
+            AI can make mistakes. Verify important information.
+          </p>
+        }
+      </div>
+    </div>
+  </div>
+</div>

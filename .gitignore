@@ -1,0 +1,31 @@
+# ── Claude Code (local machine settings) ──────────────────────────────────────
+.claude/
+
+# ── .NET Backend ───────────────────────────────────────────────────────────────
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.sln.docstates
+.vs/
+*.swp
+
+# Local appsettings overrides — put machine-specific secrets here, never commit
+**/appsettings.*.local.json
+**/appsettings.local.json
+
+# ── Dev scratch files ──────────────────────────────────────────────────────────
+angular-releases-extracted.md
+angular-signals-extracted.md
+
+# ── OS files ───────────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ── JetBrains IDEs ────────────────────────────────────────────────────────────
+.idea/
+*.iml

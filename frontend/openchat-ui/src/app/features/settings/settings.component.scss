@@ -1,0 +1,18 @@
+@reference "tailwindcss";
+
+.tab-item {
+  @apply flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium
+    text-neutral-400 hover:bg-neutral-800/40 hover:text-white
+    transition-colors cursor-pointer;
+}
+
+.tab-active {
+  @apply bg-neutral-800/60 text-white;
+  border-left: 2px solid var(--color-purple-500);
+  padding-left: calc(1rem - 2px);
+}
+
+.tab-disabled {
+  @apply opacity-50 cursor-not-allowed
+    hover:bg-transparent hover:text-neutral-400;
+}

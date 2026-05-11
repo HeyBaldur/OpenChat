@@ -1,0 +1,707 @@
+<div class="flex h-screen bg-neutral-950 overflow-hidden">
+
+  <app-sidebar
+    [userId]="userId"
+    [activeConversationId]="null"
+    (conversationSelected)="selectConversation($event)"
+    (newChat)="startNewChat()"
+  />
+
+  <div class="flex-1 flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="flex items-center gap-3 px-8 py-4 border-b border-white/8 shrink-0">
+      <div class="w-8 h-8 rounded-lg bg-purple-600/20 border border-purple-500/30 flex items-center justify-center">
+        <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-sm font-semibold text-white">Architecture & Documentation</h1>
+        <p class="text-xs text-neutral-500">OpenChatAi · Technical reference for developers</p>
+      </div>
+    </header>
+
+    <!-- Scrollable content -->
+    <div class="flex-1 overflow-y-auto">
+      <div class="max-w-5xl mx-auto px-8 py-10 space-y-16">
+
+        <!-- ── Overview ───────────────────────────────────────────── -->
+        <section>
+          <div class="flex items-center gap-3 mb-6">
+            <span class="text-xs font-mono text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20">01</span>
+            <h2 class="text-xl font-bold text-white">Overview</h2>
+          </div>
+
+          <p class="text-neutral-400 text-sm leading-relaxed mb-6">
+            OpenChatAi is a full-stack AI chat application. Users chat in real time with a local LLM
+            (Ollama / llama3) through a .NET 9 streaming API. Conversations and token usage are persisted in MongoDB.
+            The Angular 21 frontend renders streamed responses token-by-token using Server-Sent Events and
+            requestAnimationFrame batching at 60 fps.
+          </p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            @for (stat of [
+              { label: 'Frontend', value: 'Angular 21', sub: 'Standalone · Signals' },
+              { label: 'Backend', value: '.NET 9', sub: 'Web API · C#' },
+              { label: 'Database', value: 'MongoDB', sub: 'Driver 3.x' },
+              { label: 'AI Engine', value: 'Ollama', sub: 'qwen2.5 · llama3.1' }
+            ]; track stat.label) {
+              <div class="bg-neutral-900 border border-white/8 rounded-xl p-4">
+                <p class="text-xs text-neutral-500 mb-1">{{ stat.label }}</p>
+                <p class="text-base font-bold text-white">{{ stat.value }}</p>
+                <p class="text-xs text-neutral-600 mt-0.5">{{ stat.sub }}</p>
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- ── Tech Stack ─────────────────────────────────────────── -->
+        <section>
+          <div class="flex items-center gap-3 mb-6">
+            <span class="text-xs font-mono text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20">02</span>
+            <h2 class="text-xl font-bold text-white">Tech Stack</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <div class="bg-neutral-900 border border-white/8 rounded-xl p-5">
+              <h3 class="text-sm font-semibold text-purple-400 mb-4 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                Frontend
+              </h3>
+              <table class="w-full text-xs">
+                <tbody class="divide-y divide-white/5">
+                  @for (row of [
+                    { tech: 'Angular', version: '21', role: 'SPA framework (standalone components)' },
+                    { tech: 'TypeScript', version: '5.9', role: 'Language' },
+                    { tech: 'Tailwind CSS', version: '4', role: 'Utility-first styling' },
+                    { tech: 'ngx-markdown', version: '21', role: 'Markdown rendering' },
+                    { tech: 'highlight.js', version: '11', role: 'Code syntax highlighting' },
+                    { tech: 'Mermaid', version: '11', role: 'Architecture diagrams' }
+                  ]; track row.tech) {
+                    <tr>
+                      <td class="py-2 pr-3 font-medium text-white">{{ row.tech }}</td>
+                      <td class="py-2 pr-3 text-neutral-500 tabular-nums">v{{ row.version }}</td>
+                      <td class="py-2 text-neutral-400">{{ row.role }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <div class="bg-neutral-900 border border-white/8 rounded-xl p-5">
+              <h3 class="text-sm font-semibold text-blue-400 mb-4 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2"/>
+                </svg>
+                Backend & Infrastructure
+              </h3>
+              <table class="w-full text-xs">
+                <tbody class="divide-y divide-white/5">
+                  @for (row of [
+                    { tech: '.NET', version: '9.0', role: 'Web API runtime (C#)' },
+                    { tech: 'MongoDB.Driver', version: '3.8', role: 'Database access layer' },
+                    { tech: 'MongoDB', version: '7+', role: 'Document database' },
+                    { tech: 'Ollama', version: 'latest', role: 'Local LLM runtime' },
+                    { tech: 'llama3', version: '8B', role: 'Language model' },
+                    { tech: 'Swagger', version: '10', role: 'API docs (dev only)' }
+                  ]; track row.tech) {
+                    <tr>
+                      <td class="py-2 pr-3 font-medium text-white">{{ row.tech }}</td>
+                      <td class="py-2 pr-3 text-neutral-500 tabular-nums">v{{ row.version }}</td>
+                      <td class="py-2 text-neutral-400">{{ row.role }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ── System Architecture ────────────────────────────────── -->
+        <section>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-xs font-mono text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20">03</span>
+            <h2 class="text-xl font-bold text-white">System Architecture</h2>
+          </div>
+          <p class="text-neutral-500 text-sm mb-6 ml-14">High-level view of all system components and their connections.</p>
+
+          <div class="bg-neutral-900 border border-white/8 rounded-xl p-6">
+            <app-mermaid [diagram]="systemContextDiagram" />
+          </div>
+        </section>
+
+        <!-- ── Backend Architecture ───────────────────────────────── -->
+        <section>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-xs font-mono text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20">04</span>
+            <h2 class="text-xl font-bold text-white">Backend Architecture</h2>
+          </div>
+          <p class="text-neutral-500 text-sm mb-6 ml-14">
+            Follows Clean Architecture principles. Controllers delegate to Services; Services own business logic
+            and coordinate Repositories; Repositories handle MongoDB access.
+          </p>
+
+          <div class="bg-neutral-900 border border-white/8 rounded-xl p-6 mb-4">
+            <app-mermaid [diagram]="backendArchDiagram" />
+          </div>
+
+          <div class="bg-neutral-900 border border-white/8 rounded-xl overflow-hidden">
+            <div class="px-5 py-3 border-b border-white/8">
+              <h3 class="text-sm font-semibold text-white">API Endpoints</h3>
+            </div>
+            <table class="w-full text-xs">
+              <thead>
+                <tr class="border-b border-white/8">
+                  <th class="text-left px-5 py-2.5 text-neutral-500 font-medium">Method</th>
+                  <th class="text-left px-5 py-2.5 text-neutral-500 font-medium">Route</th>
+                  <th class="text-left px-5 py-2.5 text-neutral-500 font-medium">Description</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/5">
+                @for (ep of [
+                  { method: 'POST',   color: 'text-green-400',  route: '/auth/signup',                    desc: 'Register a new user account' },
+                  { method: 'POST',   color: 'text-green-400',  route: '/auth/login',                     desc: 'Authenticate and receive a JWT token' },
+                  { method: 'GET',    color: 'text-blue-400',   route: '/models',                         desc: 'List available Ollama models' },
+                  { method: 'POST',   color: 'text-green-400',  route: '/chat/stream',                    desc: 'Stream assistant response via SSE' },
+                  { method: 'POST',   color: 'text-green-400',  route: '/chat',                           desc: 'Single-shot chat response (no streaming)' },
+                  { method: 'GET',    color: 'text-blue-400',   route: '/chat/conversation/:id/messages', desc: 'Load last 100 messages of a conversation' },
+                  { method: 'GET',    color: 'text-blue-400',   route: '/conversation/:userId',           desc: 'List all conversations for a user' },
+                  { method: 'PUT',    color: 'text-yellow-400', route: '/conversation/:id/model',         desc: 'Update the model for a conversation' },
+                  { method: 'DELETE', color: 'text-red-400',    route: '/conversation/:id',               desc: 'Delete conversation and all its messages' }
+                ]; track ep.route + ep.method) {
+                  <tr>
+                    <td class="px-5 py-3">
+                      <span class="font-mono font-bold" [class]="ep.color">{{ ep.method }}</span>
+                    </td>
+                    <td class="px-5 py-3 font-mono text-neutral-300">{{ ep.route }}</td>
+                    <td class="px-5 py-3 text-neutral-400">{{ ep.desc }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ── Frontend Architecture ──────────────────────────────── -->
+        <section>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-xs font-mono text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20">05</span>
+            <h2 class="text-xl font-bold text-white">Frontend Architecture</h2>
+          </div>
+          <p class="text-neutral-500 text-sm mb-6 ml-14">
+            Standalone Angular 21 application. Features are self-contained under <code class="text-cyan-400 bg-cyan-500/10 px-1 rounded">features/</code>.
+            Reusable UI lives in <code class="text-cyan-400 bg-cyan-500/10 px-1 rounded">shared/</code>.
+            Singleton services and models live in the app root.
+          </p>
+
+          <div class="bg-neutral-900 border border-white/8 rounded-xl p-6 mb-4">
+            <app-mermaid [diagram]="frontendArchDiagram" />
+          </div>
+
+          <div class="bg-neutral-900 border border-white/8 rounded-xl overflow-hidden">
+            <div class="px-5 py-3 border-b border-white/8">
+              <h3 class="text-sm font-semibold text-white">Folder Structure</h3>
+            </div>
+            <div class="px-5 py-4">
+              <pre class="text-xs text-neutral-400 leading-relaxed font-mono">src/app/
+├── features/
+│   ├── auth/               <span class="text-neutral-600"># Login and signup pages</span>
+│   ├── docs/               <span class="text-neutral-600"># This documentation page  (/docs)</span>
+│   └── settings/           <span class="text-neutral-600"># Settings page  (/settings)</span>
+│       └── allowed-domains/<span class="text-neutral-600"># Domain allowlist management</span>
+├── components/             <span class="text-neutral-600"># Core UI components</span>
+│   ├── chat/               <span class="text-neutral-600"># Main chat interface  (/  and  /c/:id)</span>
+│   ├── sidebar/
+│   ├── markdown-message/
+│   ├── user-message/
+│   ├── model-selector/     <span class="text-neutral-600"># Per-conversation model dropdown</span>
+│   ├── tool-indicator/     <span class="text-neutral-600"># In-progress tool call status</span>
+│   ├── sources-footer/     <span class="text-neutral-600"># URLs fetched during generation</span>
+│   └── confirm-dialog/
+├── shared/
+│   └── components/
+│       └── mermaid/        <span class="text-neutral-600"># Reusable Mermaid diagram renderer</span>
+├── services/               <span class="text-neutral-600"># Singleton services</span>
+│   ├── auth.service.ts
+│   ├── chat.service.ts
+│   ├── conversation.service.ts
+│   ├── model.service.ts
+│   ├── allowlist.service.ts
+│   ├── excel.service.ts
+│   └── confirm.service.ts
+├── models/
+│   ├── auth.model.ts
+│   ├── chat.model.ts
+│   ├── conversation.model.ts
+│   ├── tool-event.model.ts
+│   └── allowed-domain.model.ts
+├── app.routes.ts
+└── app.config.ts</pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Message Flow ───────────────────────────────────────── -->
+        <section>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-xs font-mono text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20">06</span>
+            <h2 class="text-xl font-bold text-white">Message Flow</h2>
+          </div>
+          <p class="text-neutral-500 text-sm mb-6 ml-14">
+            End-to-end sequence from the moment the user submits a message to the rendered response.
+          </p>
+
+          <div class="bg-neutral-900 border border-white/8 rounded-xl p-6">
+            <app-mermaid [diagram]="agenticFlowDiagram" />
+          </div>
+
+          <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            @for (detail of [
+              { title: 'SSE Streaming', desc: 'The API writes each Ollama token directly into the HTTP response stream as a Server-Sent Event. No buffering.' },
+              { title: 'rAF Batching', desc: 'The UI accumulates tokens in a raw buffer and flushes to Angular signals only on each requestAnimationFrame (~16ms).' },
+              { title: 'Token History', desc: 'ChatService loads the last 20 messages before each request to maintain conversation context with the LLM.' }
+            ]; track detail.title) {
+              <div class="bg-neutral-900 border border-white/8 rounded-xl p-4">
+                <p class="text-sm font-semibold text-white mb-1.5">{{ detail.title }}</p>
+                <p class="text-xs text-neutral-500 leading-relaxed">{{ detail.desc }}</p>
+              </div>
+            }
+          </div>
+
+          <div class="mt-4 bg-neutral-900 border border-white/8 rounded-xl p-6">
+            <h3 class="text-sm font-semibold text-white mb-4">Tool Calling Decision Loop</h3>
+            <p class="text-xs text-neutral-500 mb-4">Detailed flowchart of how <code class="text-cyan-400 bg-cyan-500/10 px-1 rounded">AgenticChatService</code> decides when to call tools and when to stream the final answer.</p>
+            <app-mermaid [diagram]="toolCallingLoopDiagram" />
+          </div>
+        </section>
+
+        <!-- ── Settings & Domain Allowlist ───────────────────────── -->
+        <section>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-xs font-mono text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20">07</span>
+            <h2 class="text-xl font-bold text-white">Settings & Domain Allowlist</h2>
+          </div>
+          <p class="text-neutral-500 text-sm mb-6 ml-14">
+            Per-user configuration for agentic tool use. Controls which external domains the AI can fetch
+            when using the <code class="text-cyan-400 bg-cyan-500/10 px-1 rounded">fetch_url</code> tool.
+            Accessible at <code class="text-cyan-400 bg-cyan-500/10 px-1 rounded">/settings/allowed-domains</code>.
+          </p>
+
+          <div class="bg-neutral-900 border border-white/8 rounded-xl overflow-hidden mb-4">
+            <div class="px-5 py-3 border-b border-white/8">
+              <h3 class="text-sm font-semibold text-white">Allowlist API Endpoints</h3>
+            </div>
+            <table class="w-full text-xs">
+              <thead>
+                <tr class="border-b border-white/8">
+                  <th class="text-left px-5 py-2.5 text-neutral-500 font-medium">Method</th>
+                  <th class="text-left px-5 py-2.5 text-neutral-500 font-medium">Route</th>
+                  <th class="text-left px-5 py-2.5 text-neutral-500 font-medium">Description</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/5">
+                @for (ep of [
+                  { method: 'GET',    color: 'text-blue-400',   route: '/api/allowlist',            desc: 'Get all allowed domains for the authenticated user' },
+                  { method: 'POST',   color: 'text-green-400',  route: '/api/allowlist',            desc: 'Add a new allowed domain' },
+                  { method: 'PUT',    color: 'text-yellow-400', route: '/api/allowlist/:id',        desc: 'Update a domain entry (name, category, subdomains)' },
+                  { method: 'DELETE', color: 'text-red-400',    route: '/api/allowlist/:id',        desc: 'Remove a domain permanently' },
+                  { method: 'PATCH',  color: 'text-orange-400', route: '/api/allowlist/:id/toggle', desc: 'Toggle a domain enabled/disabled without deleting it' },
+                  { method: 'GET',    color: 'text-blue-400',   route: '/api/allowlist/test?url=',  desc: 'Test whether a given URL passes the allowlist check' }
+                ]; track ep.route + ep.method) {
+                  <tr>
+                    <td class="px-5 py-3">
+                      <span class="font-mono font-bold" [class]="ep.color">{{ ep.method }}</span>
+                    </td>
+                    <td class="px-5 py-3 font-mono text-neutral-300">{{ ep.route }}</td>
+                    <td class="px-5 py-3 text-neutral-400">{{ ep.desc }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+            @for (item of [
+              {
+                title: '23 Default Domains',
+                desc: 'Seeded automatically on first access per user: angular.dev, react.dev, developer.mozilla.org, stackoverflow.com, github.com and more across 7 categories.',
+                color: 'text-purple-400'
+              },
+              {
+                title: 'Domain Categories',
+                desc: 'framework_docs · platform_docs · language_docs · web_docs · community · code_hosting · reference — used for grouping in the UI only.',
+                color: 'text-blue-400'
+              },
+              {
+                title: 'Subdomain Support',
+                desc: 'AllowSubdomains extends a rule to all subdomains. Enabling github.com with this flag also permits gist.github.com and raw.githubusercontent.com.',
+                color: 'text-cyan-400'
+              }
+            ]; track item.title) {
+              <div class="bg-neutral-900 border border-white/8 rounded-xl p-4">
+                <p class="text-sm font-semibold mb-1.5" [class]="item.color">{{ item.title }}</p>
+                <p class="text-xs text-neutral-500 leading-relaxed">{{ item.desc }}</p>
+              </div>
+            }
+          </div>
+
+          <div class="bg-neutral-900 border border-white/8 rounded-xl p-5">
+            <h3 class="text-sm font-semibold text-white mb-3">WebFetcherService — Validation Pipeline</h3>
+            <p class="text-xs text-neutral-400 leading-relaxed mb-3">
+              Every outbound fetch goes through a multi-stage pipeline before any HTTP request is made:
+            </p>
+            <div class="space-y-2 text-xs text-neutral-500">
+              @for (step of [
+                { n: '1', label: 'Scheme check', detail: 'Only http:// and https:// are permitted.' },
+                { n: '2', label: 'SSRF prevention', detail: 'DNS resolution performed; private IP ranges (10.x, 172.16–31.x, 192.168.x, 127.x, 169.254.x) and reserved hostnames (localhost, .local, .internal) are rejected.' },
+                { n: '3', label: 'Allowlist check', detail: 'Domain (and optionally subdomains) must appear in the user\'s enabled list. Result is cached via IMemoryCache.' },
+                { n: '4', label: 'HTTP request', detail: '10 s timeout, 2 MB response cap, ResponseHeadersRead streaming.' },
+                { n: '5', label: 'Content-Type check', detail: 'Only text/html and application/xhtml+xml are accepted.' },
+                { n: '6', label: 'Content extraction', detail: 'AngleSharp parses HTML; main content preferred via #content / .docs-content / main / article. Decorative elements (nav, aside, footer, script) removed.' },
+                { n: '7', label: 'Markdown conversion', detail: 'ReverseMarkdown converts HTML to plain markdown, then truncated to 8 000 chars with a notice.' }
+              ]; track step.n) {
+                <div class="flex items-start gap-3">
+                  <span class="w-5 h-5 rounded-full bg-neutral-800 border border-white/10 text-neutral-400 flex items-center justify-center text-xs font-mono shrink-0">{{ step.n }}</span>
+                  <div>
+                    <span class="text-neutral-300 font-medium">{{ step.label }}</span>
+                    <span class="text-neutral-600"> — </span>
+                    <span>{{ step.detail }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Data Model ─────────────────────────────────────────── -->
+        <section>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-xs font-mono text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20">08</span>
+            <h2 class="text-xl font-bold text-white">Data Model</h2>
+          </div>
+          <p class="text-neutral-500 text-sm mb-6 ml-14">MongoDB collections and their relationships.</p>
+
+          <div class="bg-neutral-900 border border-white/8 rounded-xl p-6">
+            <app-mermaid [diagram]="dataModelDiagram" />
+          </div>
+
+          <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            @for (col of [
+              { name: 'conversations',  index: 'Index: (UserId ASC, UpdatedAt DESC)', desc: 'One document per chat session. Title auto-generated by the LLM on the first message.' },
+              { name: 'chatmessages',   index: 'Index: (ConversationId ASC, Timestamp ASC)', desc: 'One document per message. Role is "user" or "assistant". Includes ToolCallsUsed array.' },
+              { name: 'logs',           index: 'No compound index', desc: 'One log per assistant response. Tracks promptTokens, completionTokens, and model used.' },
+              { name: 'users',          index: 'No compound index', desc: 'User accounts. Stores username, email, bcrypt passwordHash, and role.' },
+              { name: 'allowed_domains',index: 'No compound index', desc: 'Per-user domain allowlist for tool use. Seeded with 23 defaults on first access.' }
+            ]; track col.name) {
+              <div class="bg-neutral-900 border border-white/8 rounded-xl p-4">
+                <p class="font-mono text-sm font-semibold text-cyan-400 mb-1">{{ col.name }}</p>
+                <p class="text-xs text-neutral-600 mb-2">{{ col.index }}</p>
+                <p class="text-xs text-neutral-500 leading-relaxed">{{ col.desc }}</p>
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- ── Privacy & Offline Mode ────────────────────────────── -->
+        <section>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-xs font-mono text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20">09</span>
+            <h2 class="text-xl font-bold text-white">Privacy & Offline Mode</h2>
+          </div>
+          <p class="text-neutral-500 text-sm mb-6 ml-14">
+            This application is designed to run entirely on your local machine. No data ever leaves your network.
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+            @for (item of [
+              {
+                icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
+                title: '100% Local',
+                desc: 'The LLM (Ollama) runs on your own hardware. Your messages and conversations never reach any external server.',
+                color: 'text-purple-400',
+                bg: 'bg-purple-500/10',
+                border: 'border-purple-500/20'
+              },
+              {
+                icon: 'M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z',
+                title: 'Works Offline',
+                desc: 'Once Ollama and MongoDB are running, the entire app functions without an internet connection.',
+                color: 'text-blue-400',
+                bg: 'bg-blue-500/10',
+                border: 'border-blue-500/20'
+              },
+              {
+                icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582 4 8 4m0 0s8-1.79 8-4',
+                title: 'Local Data',
+                desc: 'All conversations are stored in MongoDB on localhost:27017. Only your machine has access.',
+                color: 'text-cyan-400',
+                bg: 'bg-cyan-500/10',
+                border: 'border-cyan-500/20'
+              }
+            ]; track item.title) {
+              <div class="bg-neutral-900 border border-white/8 rounded-xl p-5">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-3" [class]="item.bg + ' border ' + item.border">
+                  <svg class="w-4 h-4" [class]="item.color" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" [attr.d]="item.icon"/>
+                  </svg>
+                </div>
+                <p class="text-sm font-semibold text-white mb-1.5">{{ item.title }}</p>
+                <p class="text-xs text-neutral-500 leading-relaxed">{{ item.desc }}</p>
+              </div>
+            }
+          </div>
+
+          <div class="bg-yellow-500/5 border border-yellow-500/20 rounded-xl p-4">
+            <div class="flex items-start gap-3">
+              <svg class="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+              <div>
+                <p class="text-xs font-semibold text-yellow-300 mb-1">Note on internet connectivity</p>
+                <p class="text-xs text-neutral-400 leading-relaxed">
+                  Normal chat is fully offline. Two scenarios require internet: (1) the first-time download of an Ollama model
+                  (e.g. <code class="text-cyan-400 bg-cyan-500/10 px-1 rounded">ollama pull qwen2.5</code>),
+                  and (2) when the AI uses the <code class="text-cyan-400 bg-cyan-500/10 px-1 rounded">fetch_url</code> tool
+                  to retrieve content from your allowed domains. In both cases, your messages and conversation history
+                  never leave your machine — only the LLM's outbound web fetches touch external servers.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Model Configuration ───────────────────────────────── -->
+        <section>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-xs font-mono text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20">10</span>
+            <h2 class="text-xl font-bold text-white">Model Configuration</h2>
+          </div>
+          <p class="text-neutral-500 text-sm mb-6 ml-14">
+            The default model and Ollama connection are set in <code class="text-cyan-400 bg-cyan-500/10 px-1 rounded">appsettings.json</code>.
+            Each conversation can override the model independently via the <code class="text-cyan-400 bg-cyan-500/10 px-1 rounded">ModelSelectorComponent</code>
+            in the chat UI — stored per-conversation in MongoDB and updated via <code class="text-cyan-400 bg-cyan-500/10 px-1 rounded">PUT /conversation/:id/model</code>.
+          </p>
+
+          <div class="bg-neutral-900 border border-white/8 rounded-xl overflow-hidden mb-4">
+            <div class="flex items-center justify-between px-5 py-3 border-b border-white/8">
+              <h3 class="text-sm font-semibold text-white">backend/OpenChat.API/appsettings.json</h3>
+              <span class="text-xs text-neutral-500 font-mono">Ollama section</span>
+            </div>
+            <pre class="text-xs font-mono px-5 py-4 text-neutral-300 leading-relaxed"><span class="text-neutral-600">"Ollama": </span><span class="text-yellow-300">&#123;</span>
+  <span class="text-blue-400">"BaseUrl"</span>: <span class="text-cyan-400">"http://localhost:11434"</span>,
+  <span class="text-blue-400">"Model"</span>:   <span class="text-cyan-400">"llama3:latest"</span>  <span class="text-neutral-600">// &larr; change this to switch models</span>
+<span class="text-yellow-300">&#125;</span></pre>
+          </div>
+
+          <div class="bg-neutral-900 border border-white/8 rounded-xl overflow-hidden mb-4">
+            <div class="px-5 py-3 border-b border-white/8">
+              <h3 class="text-sm font-semibold text-white">Compatible Ollama Models</h3>
+            </div>
+            <table class="w-full text-xs">
+              <thead>
+                <tr class="border-b border-white/8">
+                  <th class="text-left px-5 py-2.5 text-neutral-500 font-medium">Model</th>
+                  <th class="text-left px-5 py-2.5 text-neutral-500 font-medium">Config value</th>
+                  <th class="text-left px-5 py-2.5 text-neutral-500 font-medium">Notes</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/5">
+                @for (m of [
+                  { name: 'Qwen 2.5 7B',   val: 'qwen2.5:7b',      note: 'Default. Supports tool calling (fetch_url). Good balance of speed and quality.' },
+                  { name: 'Llama 3.1 8B',  val: 'llama3.1:8b',     note: 'Supports tool calling. Strong general-purpose model.' },
+                  { name: 'Llama 3 8B',    val: 'llama3:latest',    note: 'No tool calling support. Good balance of speed and quality.' },
+                  { name: 'Mistral 7B',    val: 'mistral',          note: 'No tool calling support. Fast and efficient.' },
+                  { name: 'Gemma 2 9B',    val: 'gemma2',           note: 'Strong instruction following.' },
+                  { name: 'DeepSeek-R1',   val: 'deepseek-r1',      note: 'Strong reasoning capabilities.' }
+                ]; track m.name) {
+                  <tr>
+                    <td class="px-5 py-3 text-white font-medium">{{ m.name }}</td>
+                    <td class="px-5 py-3 font-mono text-cyan-400">{{ m.val }}</td>
+                    <td class="px-5 py-3 text-neutral-400">{{ m.note }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="bg-neutral-900 border border-white/8 rounded-xl p-5">
+            <h3 class="text-sm font-semibold text-white mb-3">How to switch models</h3>
+            <ol class="space-y-3 text-xs text-neutral-400">
+              <li class="flex items-start gap-3">
+                <span class="w-5 h-5 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs font-bold shrink-0">1</span>
+                Pull the model with Ollama: <code class="text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded ml-1 font-mono">ollama pull qwen2.5:7b</code>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="w-5 h-5 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs font-bold shrink-0">2</span>
+                <span>Open <code class="text-neutral-300 bg-white/5 px-1.5 py-0.5 rounded font-mono">appsettings.json</code> and set <code class="text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded font-mono">"Model": "qwen2.5:7b"</code> as the new default</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="w-5 h-5 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs font-bold shrink-0">3</span>
+                Restart the API — press <kbd class="bg-neutral-800 border border-white/10 px-1.5 py-0.5 rounded text-neutral-300">R</kbd> in dev.ps1 or run <code class="font-mono text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded">dotnet watch run</code>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="w-5 h-5 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs font-bold shrink-0">4</span>
+                Or switch model per-conversation via the <strong class="text-white">model selector</strong> in the chat UI — no restart required.
+              </li>
+            </ol>
+          </div>
+        </section>
+
+        <!-- ── AI Behavior & Hallucinations ──────────────────────── -->
+        <section>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-xs font-mono text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20">11</span>
+            <h2 class="text-xl font-bold text-white">AI Behavior & Hallucinations</h2>
+          </div>
+          <p class="text-neutral-500 text-sm mb-6 ml-14">
+            Understanding how the LLM generates responses and what to do when it behaves unexpectedly.
+          </p>
+
+          <!-- How the system prompt works -->
+          <div class="bg-neutral-900 border border-white/8 rounded-xl overflow-hidden mb-4">
+            <div class="px-5 py-3 border-b border-white/8">
+              <h3 class="text-sm font-semibold text-white">How the System Prompt works</h3>
+            </div>
+            <div class="px-5 py-4 space-y-3 text-xs text-neutral-400 leading-relaxed">
+              <p>
+                Every request to Ollama begins with a <strong class="text-white">system message</strong> — a set of instructions that defines
+                the assistant's personality, scope, and behavior rules. This is injected before the conversation history on every single call.
+                The model never sees a request without these instructions.
+              </p>
+              <p>
+                The system prompt is defined in
+                <code class="text-cyan-400 bg-cyan-500/10 px-1 rounded font-mono">backend/OpenChat.API/Services/OllamaService.cs</code>
+                and can be overridden via <code class="text-cyan-400 bg-cyan-500/10 px-1 rounded font-mono">appsettings.json → Ollama:SystemPrompt</code>.
+              </p>
+            </div>
+          </div>
+
+          <!-- What is hallucination -->
+          <div class="bg-red-500/5 border border-red-500/20 rounded-xl p-5 mb-4">
+            <div class="flex items-start gap-3 mb-3">
+              <svg class="w-4 h-4 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+              <h3 class="text-sm font-semibold text-red-300">What is a hallucination?</h3>
+            </div>
+            <p class="text-xs text-neutral-400 leading-relaxed mb-3">
+              LLMs do not "know" facts — they generate statistically likely responses based on their training data.
+              When asked something the system prompt does not address (like "who built you?"), the model may
+              <strong class="text-white">invent a plausible-sounding answer</strong> rather than admitting it doesn't know.
+              This is called a <strong class="text-red-300">hallucination</strong>.
+            </p>
+            <div class="bg-black/30 rounded-lg p-3 border border-red-500/10">
+              <p class="text-xs text-neutral-500 mb-2 font-medium">Real example from this app:</p>
+              <p class="text-xs text-neutral-500 mb-1">User asked: <span class="text-neutral-300 italic">"Who is your developer?"</span></p>
+              <p class="text-xs text-neutral-500">Model responded: <span class="text-red-300 italic">"My developer is a company called Rendlement..."</span></p>
+              <p class="text-xs text-neutral-600 mt-2">
+                "Rendlement" does not exist — the model fabricated it because the system prompt did not specify the developer.
+              </p>
+            </div>
+          </div>
+
+          <!-- The fix -->
+          <div class="bg-purple-500/5 border border-purple-500/20 rounded-xl p-5 mb-4">
+            <div class="flex items-start gap-3 mb-3">
+              <svg class="w-4 h-4 text-purple-400 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+              <h3 class="text-sm font-semibold text-purple-300">Fix already applied</h3>
+            </div>
+            <p class="text-xs text-neutral-400 leading-relaxed mb-3">
+              The system prompt now includes an explicit instruction that prevents the model from inventing a developer name:
+            </p>
+            <pre class="text-xs font-mono bg-black/40 rounded-lg px-4 py-3 text-neutral-300 leading-relaxed whitespace-pre-wrap">IMPORTANT: If asked who created you, who your developer is,
+or who built you, say that you are a custom AI assistant.
+Do not invent, guess, or name any company or individual
+as your developer.</pre>
+          </div>
+
+          <!-- General guidance -->
+          <div class="bg-neutral-900 border border-white/8 rounded-xl p-5">
+            <h3 class="text-sm font-semibold text-white mb-4">Best practices for controlling LLM behavior</h3>
+            <div class="space-y-3">
+              @for (tip of [
+                {
+                  title: 'Be explicit in the system prompt',
+                  desc: 'If there is a topic the model should handle in a specific way, add an explicit rule. The model follows instructions better than it follows implied intent.'
+                },
+                {
+                  title: 'Restrict scope to avoid drift',
+                  desc: 'Adding explicit scope rules ("Only answer questions about X") prevents the model from wandering into unrelated areas.'
+                },
+                {
+                  title: 'Verify critical answers',
+                  desc: 'Treat every model response as a draft. For anything safety-critical always encourage users to consult relevant professionals or authoritative sources.'
+                },
+                {
+                  title: 'Larger models hallucinate less',
+                  desc: 'Upgrading from llama3 8B to llama3 70B or a specialized fine-tuned model significantly reduces hallucinations, at the cost of hardware requirements.'
+                }
+              ]; track tip.title) {
+                <div class="flex items-start gap-3">
+                  <svg class="w-3.5 h-3.5 text-purple-500 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                  <div>
+                    <p class="text-xs font-semibold text-white">{{ tip.title }}</p>
+                    <p class="text-xs text-neutral-500 leading-relaxed mt-0.5">{{ tip.desc }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Local Setup ────────────────────────────────────────── -->
+        <section class="pb-10">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="text-xs font-mono text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20">12</span>
+            <h2 class="text-xl font-bold text-white">Local Setup</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <div class="bg-neutral-900 border border-white/8 rounded-xl p-5">
+              <h3 class="text-sm font-semibold text-white mb-4">Prerequisites</h3>
+              <ul class="space-y-2 text-xs text-neutral-400">
+                @for (req of [
+                  '.NET 9 SDK',
+                  'Node.js 20+ and npm 10+',
+                  'MongoDB running on localhost:27017',
+                  'Ollama installed with llama3 pulled'
+                ]; track req) {
+                  <li class="flex items-start gap-2">
+                    <svg class="w-3.5 h-3.5 text-purple-500 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    {{ req }}
+                  </li>
+                }
+              </ul>
+            </div>
+
+            <div class="bg-neutral-900 border border-white/8 rounded-xl p-5">
+              <h3 class="text-sm font-semibold text-white mb-4">Run with dev.ps1</h3>
+              <p class="text-xs text-neutral-500 mb-3">From the project root in PowerShell:</p>
+              <pre class="text-xs font-mono bg-black/40 rounded-lg px-4 py-3 text-cyan-400">.\dev.ps1</pre>
+              <div class="mt-3 space-y-1.5 text-xs text-neutral-500">
+                <p><kbd class="bg-neutral-800 border border-white/10 px-1.5 py-0.5 rounded text-neutral-300">R</kbd> Restart API</p>
+                <p><kbd class="bg-neutral-800 border border-white/10 px-1.5 py-0.5 rounded text-neutral-300">U</kbd> Restart UI</p>
+                <p><kbd class="bg-neutral-800 border border-white/10 px-1.5 py-0.5 rounded text-neutral-300">Q</kbd> Quit all</p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</div>

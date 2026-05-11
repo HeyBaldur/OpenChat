@@ -1,0 +1,6 @@
+@OpenChat.API_HostAddress = http://localhost:5124
+
+GET {{OpenChat.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

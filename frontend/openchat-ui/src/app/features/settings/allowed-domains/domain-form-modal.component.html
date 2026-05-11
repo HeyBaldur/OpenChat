@@ -1,0 +1,103 @@
+<!-- Overlay -->
+<div class="modal-overlay" (click)="cancel.emit()"></div>
+
+<!-- Modal -->
+<div class="modal-box" (click)="$event.stopPropagation()">
+
+  <h2 class="modal-title">{{ isEdit ? 'Edit Domain' : 'Add Domain' }}</h2>
+
+  <!-- Server error banner -->
+  @if (externalError) {
+    <div class="error-banner">
+      <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      {{ externalError }}
+    </div>
+  }
+
+  <!-- Domain -->
+  <div class="field">
+    <label class="field-label">Domain <span class="text-red-500">*</span></label>
+    <input
+      [(ngModel)]="form.domain"
+      [disabled]="isEdit && !!domain?.isSystemDefault"
+      type="text"
+      placeholder="e.g. example.com"
+      class="field-input"
+      [class.field-input--error]="domainError()"
+    />
+    <p class="field-hint">No protocol, no path — e.g. <code>example.com</code></p>
+    @if (domainError()) {
+      <p class="field-error">{{ domainError() }}</p>
+    }
+  </div>
+
+  <!-- Category -->
+  <div class="field">
+    <label class="field-label">Category</label>
+    <select [(ngModel)]="form.category" class="field-input">
+      @for (cat of categories; track cat) {
+        <option [value]="cat">{{ categoryLabel[cat] }}</option>
+      }
+    </select>
+  </div>
+
+  <!-- Description -->
+  <div class="field">
+    <label class="field-label">Description</label>
+    <input
+      [(ngModel)]="form.description"
+      type="text"
+      placeholder="Short description (optional)"
+      class="field-input"
+    />
+  </div>
+
+  <!-- Allow subdomains -->
+  <div class="field-row">
+    <div class="flex-1">
+      <p class="field-label mb-0.5">Allow subdomains</p>
+      <p class="field-hint">If enabled, <code>*.example.com</code> will also be allowed</p>
+    </div>
+    <button
+      type="button"
+      (click)="form.allowSubdomains = !form.allowSubdomains"
+      class="toggle"
+      [class.toggle--on]="form.allowSubdomains"
+    >
+      <span class="toggle-knob"></span>
+    </button>
+  </div>
+
+  <!-- Enabled -->
+  <div class="field-row">
+    <div class="flex-1">
+      <p class="field-label mb-0.5">Enabled</p>
+      <p class="field-hint">Disabled domains are excluded from tool calling</p>
+    </div>
+    <button
+      type="button"
+      (click)="form.enabled = !form.enabled"
+      class="toggle"
+      [class.toggle--on]="form.enabled"
+    >
+      <span class="toggle-knob"></span>
+    </button>
+  </div>
+
+  <!-- Actions -->
+  <div class="modal-actions">
+    <button type="button" (click)="cancel.emit()" class="btn-ghost">Cancel</button>
+    <button
+      type="button"
+      (click)="submit()"
+      [disabled]="saving()"
+      class="btn-primary"
+    >
+      {{ saving() ? 'Saving…' : 'Save' }}
+    </button>
+  </div>
+
+</div>
