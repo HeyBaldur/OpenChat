@@ -13,6 +13,17 @@ A full-stack local AI chat application. Chat in real time with a locally running
 - **SSRF protection** — All outbound web fetches go through a multi-stage security validation pipeline (scheme check → private-IP rejection → allowlist → content-type → size cap)
 - **Internal documentation** — Built-in `/docs` page with live Mermaid architecture diagrams
 
+## Screenshots
+
+## Screenshots
+
+| | |
+|:---:|:---:|
+| <img src="https://github.com/user-attachments/assets/7f847eeb-1331-44d6-b2fc-c78bdd0ffe2e" alt="Welcome screen" /> | <img src="https://github.com/user-attachments/assets/682edae5-7c37-48a2-9b99-023167c10828" alt="Chat with tool calling and source citation" /> |
+| **Welcome screen** — Clean entry point with starter suggestions | **Chat with tool calling** — Live answers backed by source citations |
+| <img src="https://github.com/user-attachments/assets/89479fc5-382e-4aae-abc5-d973d5af5f2d" alt="Settings — Allowed Domains management" /> | <img src="https://github.com/user-attachments/assets/d37823a3-44f8-477d-aebb-65517ce6dda4" alt="Architecture documentation page" /> |
+| **Allowed Domains** — Per-user allowlist with categories and toggles | **Architecture Docs** — Technical reference embedded in the app |
+
 ## Tech Stack
 
 | Layer | Technology |
