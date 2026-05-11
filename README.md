@@ -40,14 +40,120 @@ A full-stack local AI chat application. Chat in real time with a locally running
 - [**.NET 9 SDK**](https://dotnet.microsoft.com/download)
 - [**Node.js 20+**](https://nodejs.org) and npm 10+
 - [**MongoDB Community Server**](https://www.mongodb.com/try/download/community) — running on `localhost:27017`
-- [**Ollama**](https://ollama.com) — with at least one model pulled
+- [**Ollama**](https://ollama.com) — with at least one model pulled (see the [Models & Hardware](#models--hardware) section for recommendations)
 
-```bash
-# Recommended — supports tool calling (web fetch)
-ollama pull qwen2.5:7b
+## Models & Hardware
 
-# Alternative with tool calling support
+OpenChatAi runs entirely with **local LLMs via Ollama**. Choosing the right model
+matters: too small and answers are weak; too big and your machine can't load it.
+This section is here to save you the trial-and-error.
+
+### How model size relates to your machine
+
+LLMs need to fit in memory (RAM or VRAM). A rough guide:
+
+| Model size | RAM needed | What runs it | Use case |
+|------------|-----------|--------------|----------|
+| 1-3B       | 2-4 GB    | Any laptop   | Toy / experimentation |
+| 7-8B       | 6-8 GB    | Mid-range laptop (16 GB) | **Sweet spot for this project** |
+| 14B        | 10-12 GB  | High-end laptop (32 GB) | Better reasoning, slower |
+| 32B        | ~20 GB    | Workstation | Genuinely strong local model |
+| 70B        | ~45 GB    | Multi-GPU rig | Near GPT-3.5 quality |
+| 400B+      | ~250 GB+  | GPU cluster | Frontier-tier, not for personal use |
+
+**For OpenChatAi, the 7-8B range is recommended.** Smaller models struggle with
+tool calling; larger ones may not fit your machine.
+
+### Recommended models (tool calling supported)
+
+These work well with OpenChatAi's agentic tool calling system:
+
+| Model | Size | Why |
+|-------|------|-----|
+| [`llama3.1:8b`](https://ollama.com/library/llama3.1) | 4.9 GB | **Most obedient for tool calling.** Best default. |
+| [`qwen2.5:7b`](https://ollama.com/library/qwen2.5) | 4.7 GB | Good general quality, decent tool calling. |
+| [`mistral`](https://ollama.com/library/mistral) | 4.1 GB | Fast, lighter alternative. |
+| [`deepseek-r1:8b`](https://ollama.com/library/deepseek-r1) | 5.2 GB | Reasoning model — "thinks before answering". |
+
+```powershell
+# Pull the recommended default
 ollama pull llama3.1:8b
+```
+
+### Models that do NOT support tool calling
+
+These are still useful for basic chat, but the agentic web fetching feature is
+auto-disabled when they're selected:
+
+| Model | Size | Note |
+|-------|------|------|
+| [`llama3:latest`](https://ollama.com/library/llama3) | 4.7 GB | Older — predecessor of llama3.1 |
+| [`phi3:mini`](https://ollama.com/library/phi3) | 2.3 GB | Lightweight, for resource-constrained machines |
+| [`gemma2`](https://ollama.com/library/gemma2) | 5.4 GB | Google's model |
+
+### About DeepSeek-R1: distilled vs. real
+
+The model `deepseek-r1` in Ollama is **not the same** as the full DeepSeek-R1
+that you may have heard about. The Ollama versions are **distilled**: smaller
+models (Qwen, Llama) trained to imitate parts of the reasoning behavior of the
+real DeepSeek-R1.
+
+| Variant | Size | What it actually is |
+|---------|------|---------------------|
+| `deepseek-r1:1.5b` | 1.1 GB | Qwen2.5-1.5B distilled |
+| `deepseek-r1:7b`   | 4.7 GB | Qwen2.5-7B distilled |
+| `deepseek-r1:8b`   | 5.2 GB | Llama3.1-8B distilled |
+| `deepseek-r1:14b`  | 9.0 GB | Qwen2.5-14B distilled |
+| `deepseek-r1:32b`  | 20 GB  | Qwen2.5-32B distilled |
+| `deepseek-r1:70b`  | 43 GB  | Llama3.3-70B distilled |
+| `deepseek-r1:671b` | 404 GB | The actual full DeepSeek-R1 |
+
+Only the **671B variant** is the original model. The smaller ones are useful and
+they inherit some reasoning style, but they are not the same beast.
+
+See: https://ollama.com/library/deepseek-r1
+
+### A word on frontier open-source models
+
+You may come across announcements of impressive open-source models on
+[Hugging Face](https://huggingface.co/) like
+[**DeepSeek-V4-Flash**](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash)
+(284B params) or
+[**DeepSeek-V4-Pro**](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro)
+(1.6T params). These match closed-source models like Claude Opus and GPT-5 on
+many benchmarks.
+
+**They do not run on personal hardware:**
+
+- DeepSeek-V4-Flash requires **~170 GB of VRAM** (typically 2× H200 GPUs)
+- DeepSeek-V4-Pro requires **~860 GB of VRAM** (a real GPU cluster)
+- Even with aggressive quantization, you need a Mac Studio with 192 GB unified
+  memory ($6,000+) at minimum
+
+If you want to use these models without buying datacenter hardware, your options
+are the official [DeepSeek API](https://api-docs.deepseek.com/),
+[OpenRouter](https://openrouter.ai/), or other hosted inference providers —
+but that means giving up local execution, which defeats the privacy point of
+this project.
+
+**For a learning project on a normal laptop, stick with 7-8B models in the
+recommended list above.** The architecture lessons in this codebase apply
+identically regardless of model size.
+
+### Hugging Face vs. Ollama — how do they relate?
+
+- **[Hugging Face](https://huggingface.co/)** is "the GitHub of AI models". Millions
+  of models in their original formats. Powerful but requires more setup.
+- **[Ollama](https://ollama.com/library)** packages selected models in an
+  optimized format (GGUF), with one-command install. Curated and easy.
+
+For this project, Ollama is the right tool. Hugging Face is worth exploring if
+you outgrow the Ollama catalog or want to fine-tune models yourself.
+
+You can also pull GGUF-format models from Hugging Face directly into Ollama:
+
+```powershell
+ollama pull hf.co/<author>/<model>
 ```
 
 ## Quick Start
