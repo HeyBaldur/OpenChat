@@ -1,10 +1,19 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using OpenChat.API.Models;
-using OpenChat.API.Repositories;
-using OpenChat.API.Services;
-using OpenChat.API.Tools;
+using OpenChat.Ai.Interfaces;
+using OpenChat.Ai.Services;
+using OpenChat.Ai.Tools;
+using OpenChat.Application.Interfaces.External;
+using OpenChat.Application.Interfaces.Services;
+using OpenChat.Application.Services;
+using OpenChat.Domain.Interfaces.Repositories;
+using OpenChat.Infrastructure.Auth;
+using OpenChat.Infrastructure.Migrations;
+using OpenChat.Infrastructure.Mongo.Repositories;
+using OpenChat.Infrastructure.Mongo.Settings;
+using OpenChat.Infrastructure.Ollama;
+using OpenChat.Infrastructure.Web;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,8 +40,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDb"));
-
 var jwtSecret = builder.Configuration["Jwt:Secret"]
     ?? throw new InvalidOperationException("Jwt:Secret is not configured.");
 
@@ -50,23 +57,29 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
+builder.Services.AddMemoryCache();
 
+// --- Application services ---
+builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAllowlistService, AllowlistService>();
+builder.Services.AddHttpClient<IModelCatalogService, ModelCatalogService>();
+
+// --- Ai (agentic tool calling) ---
+builder.Services.AddScoped<IAgenticChatService, AgenticChatService>();
+builder.Services.AddScoped<IToolRegistry, ToolRegistry>();
+builder.Services.AddScoped<IToolDefinition, FetchUrlTool>();
+
+// --- Infrastructure: Mongo ---
+builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDb"));
 builder.Services.AddSingleton<IChatRepository, ChatRepository>();
 builder.Services.AddSingleton<IConversationRepository, ConversationRepository>();
 builder.Services.AddSingleton<ILogRepository, LogRepository>();
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IAllowedDomainRepository, AllowedDomainRepository>();
 
-builder.Services.AddMemoryCache();
+// --- Infrastructure: External services ---
 builder.Services.AddHttpClient<IOllamaService, OllamaService>();
-builder.Services.AddHttpClient<IModelCatalogService, ModelCatalogService>();
-builder.Services.AddScoped<IChatService, ChatService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IAllowlistService, AllowlistService>();
-
-builder.Services.AddHostedService<AllowlistMigrationV2>();
-builder.Services.AddHostedService<AllowlistMigrationV3>();
-
 builder.Services.AddHttpClient("WebFetcher", client =>
 {
     client.DefaultRequestHeaders.Add("User-Agent", "OpenChatAi/1.0");
@@ -77,11 +90,15 @@ builder.Services.AddHttpClient("WebFetcher", client =>
     MaxAutomaticRedirections = 3,
     AllowAutoRedirect = true
 });
+builder.Services.AddScoped<IWebFetcherService, WebFetcherService>();
 
-builder.Services.AddScoped<WebFetcherService>();
-builder.Services.AddScoped<IToolDefinition, FetchUrlTool>();
-builder.Services.AddScoped<IToolRegistry, ToolRegistry>();
-builder.Services.AddScoped<IAgenticChatService, AgenticChatService>();
+// --- Infrastructure: Auth ---
+builder.Services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
+builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
+// --- Infrastructure: Migrations ---
+builder.Services.AddHostedService<AllowlistMigrationV2>();
+builder.Services.AddHostedService<AllowlistMigrationV3>();
 
 builder.Services.AddCors(options =>
 {

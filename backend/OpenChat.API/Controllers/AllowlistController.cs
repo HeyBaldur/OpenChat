@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OpenChat.API.Models;
-using OpenChat.API.Services;
+using OpenChat.Application.Interfaces.Services;
+using OpenChat.Domain.Dtos;
 using System.Security.Claims;
 
 namespace OpenChat.API.Controllers;
